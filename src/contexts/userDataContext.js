@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState } from 'react';
-
+import PropTypes from 'prop-types';
 // Créez un contexte UserDataContext
 const UserDataContext = createContext();
 
@@ -9,7 +9,7 @@ export function useUserData() {
 }
 
 // Composant Provider pour envelopper l'application et fournir les données utilisateur
-export function UserDataProvider({ children }) {
+export function UserDataProvider({children}) {
 
     const [modalIsOpen, setModalIsOpen] = useState(false);
 
@@ -72,6 +72,7 @@ export function UserDataProvider({ children }) {
 
     const openModal = () => {
         setModalIsOpen(true);
+        setPath("http://localhost:8080");
     };
     const closeModal = () => {
         setModalIsOpen(false);
@@ -252,3 +253,7 @@ export function UserDataProvider({ children }) {
         </UserDataContext.Provider>
     );
 }
+
+UserDataProvider.propTypes = {
+    children: PropTypes.node.isRequired,
+};
