@@ -1,41 +1,70 @@
-import axios from 'axios';
+// import axios from 'axios';
 import PropTypes from 'prop-types';
 import React, { useState } from 'react';
 import { Row, Col, Button, Alert } from 'react-bootstrap';
 // import { Navigate } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../../../contexts/authContext';
+// import { useUserData } from '../../../contexts/userDataContext';
 
 // import * as Yup from 'yup';
 // import { Formik } from 'formik';
 
 const FirebaseLogin = ({ className }) => {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [errors, setErrors] = useState(false);
   const navigate = useNavigate();
+  const [errors, setErrors] = useState(false);
+  const { login, isLoggedIn } = useAuth();
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  // const { path } = useUserData();
 
-  const handleLogin = async (event) => {
-    event.preventDefault();
 
+  if (localStorage.getItem('user')) {
+    login();
+  }
+
+  const handleLogin = async (e) => {
+    e.preventDefault();
+  
     try {
-      const response = await axios.post("http://localhost:8080/api/v1/auth/authenticate", {
-        email,
-        password
+      const response = await fetch(`http://localhost:8080/api/v1/auth/authenticate`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          email,
+          password
+        })
       });
-
-      if (response.status === 200) {
-        console.log("User authenticated successfully");
-        let token = response.data.token;
-        localStorage.setItem("token", token);
-        navigate("*")
+  
+      if (response.ok) {
+        const responseData = await response.json();
+        const token = responseData.token;
+        localStorage.setItem('token', token);
+        // Pour les requêtes futures, définissez le header Authorization
+        // const authToken = `Bearer ${token}`;
+        // Utilisez cet authToken pour vos requêtes ultérieures
+        // axios.defaults.headers.common['Authorization'] = authToken;
+  
+        console.log(token);
+        login();
+        navigate("*");
       } else {
-        console.error("Authentication failed");
+        // Si la réponse n'est pas OK, lancez une erreur
+        throw new Error('Erreur d\'authentification');
       }
     } catch (error) {
-      console.error("Error occurred during login:", error);
-      setErrors(true);
+      console.error('Erreur d\'authentification', error);
+      setErrors("email or password incorrect");
     }
   };
+  
+
+  if (isLoggedIn) {
+    navigate("*")
+  }
+
   return (
     <React.Fragment>
       <form onSubmit={handleLogin} className={className}>

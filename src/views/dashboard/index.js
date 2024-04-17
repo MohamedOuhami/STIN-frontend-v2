@@ -13,7 +13,6 @@ const dashSalesData = [
 ];
 
 const DashDefault = () => {
-  
   return (
     <React.Fragment>
       <Row>

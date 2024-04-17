@@ -6,29 +6,35 @@ import AdminLayout from './layouts/AdminLayout';
 
 import { BASE_URL } from './config/constant';
 import Signin1 from './views/auth/signin/SignIn1';
+import { AuthProvider } from './contexts/authContext';
+import { UserDataProvider } from './contexts/userDataContext';
 
 export const renderRoutes = (routes = []) => (
   <Suspense fallback={<Loader />}>
-    <Routes>
-      <Route path='/login' element={<Signin1 />} index />
-      {routes.map((route, i) => {
-        const Guard = route.guard || Fragment;
-        const Layout = route.layout || Fragment;
-        const Element = route.element;
+    <AuthProvider>
+      <UserDataProvider>
+        <Routes>
+          <Route path='/login' element={<Signin1 />} index />
+          {routes.map((route, i) => {
+            const Guard = route.guard || Fragment;
+            const Layout = route.layout || Fragment;
+            const Element = route.element;
 
-        return (
-          <Route
-            key={i}
-            path={route.path}
-            element={
-              <Guard>
-                <Layout>{route.routes ? renderRoutes(route.routes) : <Element props={true} />}</Layout>
-              </Guard>
-            }
-          />
-        );
-      })}
-    </Routes>
+            return (
+              <Route
+                key={i}
+                path={route.path}
+                element={
+                  <Guard>
+                    <Layout>{route.routes ? renderRoutes(route.routes) : <Element props={true} />}</Layout>
+                  </Guard>
+                }
+              />
+            );
+          })}
+        </Routes>
+      </UserDataProvider>
+    </AuthProvider>
   </Suspense>
 );
 

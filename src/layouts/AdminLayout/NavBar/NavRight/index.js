@@ -9,10 +9,11 @@ import avatar1 from '../../../../assets/images/user/avatar-1.jpg';
 import avatar2 from '../../../../assets/images/user/avatar-2.jpg';
 import avatar3 from '../../../../assets/images/user/avatar-3.jpg';
 import avatar4 from '../../../../assets/images/user/avatar-4.jpg';
+import { useAuth } from '../../../../contexts/authContext';
 
 const NavRight = () => {
   const [listOpen, setListOpen] = useState(false);
-
+  const {logout} = useAuth();
   const notiData = [
     {
       name: 'Joseph William',
@@ -150,9 +151,9 @@ const NavRight = () => {
                   </Link>
                 </ListGroup.Item>
                 <ListGroup.Item as="li" bsPrefix=" ">
-                  <Link to="#" className="dropdown-item">
+                  <button onClick={logout} className="dropdown-item">
                     <i className="feather icon-log-out" /> Logout
-                  </Link>
+                  </button>
                 </ListGroup.Item>
               </ListGroup>
             </Dropdown.Menu>

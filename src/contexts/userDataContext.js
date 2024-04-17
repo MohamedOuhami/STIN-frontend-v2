@@ -9,7 +9,7 @@ export function useUserData() {
 }
 
 // Composant Provider pour envelopper l'application et fournir les données utilisateur
-export function UserDataProvider({children}) {
+export function UserDataProvider({ children }) {
 
     const [modalIsOpen, setModalIsOpen] = useState(false);
 

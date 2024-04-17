@@ -6,121 +6,133 @@ import navigation from '../../../menu-items';
 import navigationProfesseur from '../../../menu-items -professeurs';
 import navigationEtudiant from '../../../menu-items-etudiant';
 import { BASE_TITLE } from '../../../config/constant';
-// import {useAuth} from '../../contexts/autheContext'
+import { useAuth } from '../../../contexts/authContext'
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import { useUserData } from '../../../contexts/userDataContext';
+// import axios from 'axios';
 
 const Breadcrumb = () => {
   const location = useLocation();
 
   const [main, setMain] = useState([]);
   const [item, setItem] = useState([]);
-  // const { isLoggedIn, logout } = useAuth();
+  const { logout, isLoggedIn } = useAuth();
   const navigate = useNavigate();
+  const {updateUserData} = useUserData();
 
   useEffect(() => {
     const fetchUserData = async () => {
       const token = localStorage.getItem("token");
-      axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
-
+      const authToken = `Bearer ${token}`;
       try {
-        const response = await axios.get(`${path}/api/v1/auth/userinfo`);
-        updateUserData(response.data);
-        localStorage.setItem("user", response.data);
-        if (response.data.roles.some(role => role.name === 'ROLE_ADMIN')) {
-          sidebar(navigation);
-        } else if (response.data.roles.some(role => role.name === 'ROLE_PROFESSOR') && !response.data.roles.some(role => role.name === 'ROLE_ADMIN')) {
-          sidebar(navigationProfesseur);
-        } else if (response.dataroles.some(role => role.name === 'ROLE_ETUDIANT') && !response.data.roles.some(role => role.name === 'ROLE_ADMIN')) {
-          sidebar(navigationEtudiant);
+        if (token) {
+          const response = await fetch(`http://localhost:8080/api/v1/auth/userinfo`, {
+            headers: {
+              'Authorization': authToken
+            }
+          });
+          if (response.ok) {
+            const userData = await response.json();
+            updateUserData(userData);
+            localStorage.setItem("user", JSON.stringify(userData));
+            if (userData.roles.some(role => role.name === 'ROLE_ADMIN')) {
+              sidebar(navigation);
+            } else if (userData.roles.some(role => role.name === 'ROLE_PROFESSOR') && !userData.roles.some(role => role.name === 'ROLE_ADMIN')) {
+              sidebar(navigationProfesseur);
+            } else if (userData.roles.some(role => role.name === 'ROLE_ETUDIANT') && !userData.roles.some(role => role.name === 'ROLE_ADMIN')) {
+              sidebar(navigationEtudiant);
+            }
+          } else {
+            // Si la réponse n'est pas OK, lancez une erreur
+            throw new Error('Erreur lors de la récupération des données utilisateur');
+          }
         }
       } catch (error) {
-        console.error(
-          "Erreur lors de la récupération des données utilisateur :",
-          error
-        );
+        console.error("Erreur lors de la récupération des données utilisateur :", error);
+        logout();
         navigate("/login");
-        // logout();
       }
     };
-
     fetchUserData();
   }, []);
 
-const sidebar = (navigationbar) => {
-  navigationbar.items.map((item, index) => {
-    if (item.type && item.type === 'group') {
-      getCollapse(item, index);
-    }
-    return false;
-  });
-}
-
-const getCollapse = (item, index) => {
-  if (item.children) {
-    item.children.filter((collapse) => {
-      if (collapse.type && collapse.type === 'collapse') {
-        getCollapse(collapse, index);
-      } else if (collapse.type && collapse.type === 'item') {
-        if (location.pathname === collapse.url) {
-          setMain(item);
-          setItem(collapse);
-        }
+  if (!isLoggedIn) {
+    navigate("/login")
+  }
+  const sidebar = (navigationbar) => {
+    navigationbar.items.map((item, index) => {
+      if (item.type && item.type === 'group') {
+        getCollapse(item, index);
       }
       return false;
     });
   }
-};
 
-let mainContent, itemContent;
-let breadcrumbContent = '';
-let title = '';
+  const getCollapse = (item, index) => {
+    if (item.children) {
+      item.children.filter((collapse) => {
+        if (collapse.type && collapse.type === 'collapse') {
+          getCollapse(collapse, index);
+        } else if (collapse.type && collapse.type === 'item') {
+          if (location.pathname === collapse.url) {
+            setMain(item);
+            setItem(collapse);
+          }
+        }
+        return false;
+      });
+    }
+  };
 
-if (main && main.type === 'collapse') {
-  mainContent = (
-    <ListGroup.Item as="li" bsPrefix=" " className="breadcrumb-item">
-      <Link to="#">{main.title}</Link>
-    </ListGroup.Item>
-  );
-}
+  let mainContent, itemContent;
+  let breadcrumbContent = '';
+  let title = '';
 
-if (item && item.type === 'item') {
-  title = item.title;
-  itemContent = (
-    <ListGroup.Item as="li" bsPrefix=" " className="breadcrumb-item">
-      <Link to="#">{title}</Link>
-    </ListGroup.Item>
-  );
-
-  if (item.breadcrumbs !== false) {
-    breadcrumbContent = (
-      <div className="page-header">
-        <div className="page-block">
-          <div className="row align-items-center">
-            <div className="col-md-12">
-              <div className="page-header-title">
-                <h5 className="m-b-10">{title}</h5>
-              </div>
-              <ListGroup as="ul" bsPrefix=" " className="breadcrumb">
-                <ListGroup.Item as="li" bsPrefix=" " className="breadcrumb-item">
-                  <Link to="/">
-                    <i className="feather icon-home" />
-                  </Link>
-                </ListGroup.Item>
-                {mainContent}
-                {itemContent}
-              </ListGroup>
-            </div>
-          </div>
-        </div>
-      </div>
+  if (main && main.type === 'collapse') {
+    mainContent = (
+      <ListGroup.Item as="li" bsPrefix=" " className="breadcrumb-item">
+        <Link to="#">{main.title}</Link>
+      </ListGroup.Item>
     );
   }
 
-  document.title = title + BASE_TITLE;
-}
+  if (item && item.type === 'item') {
+    title = item.title;
+    itemContent = (
+      <ListGroup.Item as="li" bsPrefix=" " className="breadcrumb-item">
+        <Link to="#">{title}</Link>
+      </ListGroup.Item>
+    );
 
-return <React.Fragment>{breadcrumbContent}</React.Fragment>;
+    if (item.breadcrumbs !== false) {
+      breadcrumbContent = (
+        <div className="page-header">
+          <div className="page-block">
+            <div className="row align-items-center">
+              <div className="col-md-12">
+                <div className="page-header-title">
+                  <h5 className="m-b-10">{title}</h5>
+                </div>
+                <ListGroup as="ul" bsPrefix=" " className="breadcrumb">
+                  <ListGroup.Item as="li" bsPrefix=" " className="breadcrumb-item">
+                    <Link to="/">
+                      <i className="feather icon-home" />
+                    </Link>
+                  </ListGroup.Item>
+                  {mainContent}
+                  {itemContent}
+                </ListGroup>
+              </div>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    document.title = title + BASE_TITLE;
+  }
+
+  return <React.Fragment>{breadcrumbContent}</React.Fragment>;
 };
 
 export default Breadcrumb;
