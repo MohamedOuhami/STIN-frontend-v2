@@ -68,6 +68,67 @@ const routes = [
         path: '/app/dashboard/default',
         element: lazy(() => import('./views/dashboard'))
       },
+      // Adding the routes to the different tables and entities
+      {
+        exact: 'true',
+        path: '/prepaStudents',
+        element: lazy(() => import('./views/prepaStudents/prepaStudentsList'))
+      },
+      {
+        exact: 'true',
+        path: '/salles',
+        element: lazy(() => import('./views/salles/sallesList'))
+      },
+
+      {
+        exact: 'true',
+        path: '/modules',
+        element: lazy(() => import('./views/modules/ModulesList'))
+      },
+
+      {
+        exact: 'true',
+        path: '/elements',
+        element: lazy(() => import('./views/elements/ElementsList'))
+      },
+
+      {
+        exact: 'true',
+        path: '/seances',
+        element: lazy(() => import('./views/seances/SeancesList'))
+      },
+      {
+        exact: 'true',
+        path: '/seances/assign/:id',
+        element: lazy(() => import('./views/seances/AssignSeance'))
+      },
+      {
+        exact: 'true',
+        path: '/seances/edit/:id',
+        element: lazy(() => import('./views/seances/EditSeance2'))
+      },
+
+      {
+        exact: 'true',
+        path: '/emplois/:fil',
+        element: lazy(() => import('./views/emplois/EmploisList'))
+      },
+      {
+        exact: 'true',
+        path: '/emplois/timetable/:id',
+        element: lazy(() => import('./views/emplois/EmploisShowTimetable'))
+      },
+      {
+        exact: 'true',
+        path: '/emplois/optimize/:id',
+        element: lazy(() => import('./views/emplois/EmploisOptimize'))
+      },
+      {
+        exact: 'true',
+        path: '/elements/edit/:id',
+        element: lazy(() => import('./views/elements/EditElement'))
+      },
+
       {
         exact: 'true',
         path: '/basic/button',
@@ -117,11 +178,6 @@ const routes = [
         exact: 'true',
         path: '/charts/nvd3',
         element: lazy(() => import('./views/charts/nvd3-chart'))
-      },
-      {
-        exact: 'true',
-        path: '/maps/google-map',
-        element: lazy(() => import('./views/maps/GoogleMaps'))
       },
       {
         exact: 'true',
