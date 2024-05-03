@@ -1,7 +1,7 @@
 // import axios from 'axios';
 import PropTypes from 'prop-types';
 import React, { useState } from 'react';
-import { Row, Col, Button, Alert } from 'react-bootstrap';
+import { Row, Col, Button, Alert, FormLabel } from 'react-bootstrap';
 // import { Navigate } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../../contexts/authContext';
@@ -18,14 +18,13 @@ const FirebaseLogin = ({ className }) => {
   const [password, setPassword] = useState('');
   // const { path } = useUserData();
 
-
   if (localStorage.getItem('user')) {
     login();
   }
 
   const handleLogin = async (e) => {
     e.preventDefault();
-  
+
     try {
       const response = await fetch(`http://localhost:8080/api/v1/auth/authenticate`, {
         method: 'POST',
@@ -37,42 +36,43 @@ const FirebaseLogin = ({ className }) => {
           password
         })
       });
-  
+
       if (response.ok) {
         const responseData = await response.json();
         const token = responseData.token;
         localStorage.setItem('token', token);
-        // Pour les requêtes futures, définissez le header Authorization
-        // const authToken = `Bearer ${token}`;
-        // Utilisez cet authToken pour vos requêtes ultérieures
-        // axios.defaults.headers.common['Authorization'] = authToken;
-  
+        const user = responseData.user;
+        localStorage.setItem('user', JSON.stringify(user));
+
         console.log(token);
+        console.log(responseData.user);
         login();
-        navigate("*");
+        navigate('*');
       } else {
         // Si la réponse n'est pas OK, lancez une erreur
-        throw new Error('Erreur d\'authentification');
+        throw new Error("Erreur d'authentification");
       }
     } catch (error) {
-      console.error('Erreur d\'authentification', error);
-      setErrors("email or password incorrect");
+      console.error("Erreur d'authentification", error);
+      setErrors('email or password incorrect');
     }
   };
-  
 
   if (isLoggedIn) {
-    navigate("*")
+    navigate('*');
   }
 
   return (
     <React.Fragment>
+
       <form onSubmit={handleLogin} className={className}>
         <div className="form-group mb-3">
+          <FormLabel>Adresse email</FormLabel>
           <input
             className="form-control"
             label="Email Address / Username"
             name="email"
+            placeholder="Entrer votre email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             type="email"
@@ -80,11 +80,13 @@ const FirebaseLogin = ({ className }) => {
           {/* {touched.email && errors.email && <small className="text-danger form-text">{errors.email}</small>} */}
         </div>
         <div className="form-group mb-4">
+          <FormLabel>Mot de passe</FormLabel>
           <input
             className="form-control"
             label="Password"
             type="password"
             id="password"
+            placeholder="Entrer votre mot de passe"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
           />
@@ -93,38 +95,17 @@ const FirebaseLogin = ({ className }) => {
 
         {errors && (
           <Col sm={12}>
-            <Alert variant="danger">erreur authentification</Alert>
+            <Alert variant="danger">Erreur lors de l&apos;authentification</Alert>
           </Col>
         )}
-
-        <div className="custom-control custom-checkbox  text-start mb-4 mt-2">
-          <input type="checkbox" className="custom-control-input" id="customCheck1" />
-          <label className="custom-control-label" htmlFor="customCheck1">
-            Save credentials.
-          </label>
-        </div>
-
         <Row>
           <Col mt={2}>
             <Button className="btn-block" color="primary" size="large" type="submit" variant="primary">
-              Signin
+              S&apos;authentifier
             </Button>
           </Col>
         </Row>
       </form>
-      <Row>
-        <Col sm={12}>
-          <h5 className="my-3"> OR </h5>
-        </Col>
-      </Row>
-
-      <Row>
-        <Col sm={12}>
-          <Button variant="danger">
-            <i className="fa fa-lock" /> Sign in with Google
-          </Button>
-        </Col>
-      </Row>
 
       <hr />
     </React.Fragment>

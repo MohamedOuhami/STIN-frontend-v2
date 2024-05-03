@@ -3,13 +3,12 @@ import { ListGroup } from 'react-bootstrap';
 import { Link, useLocation } from 'react-router-dom';
 
 import navigation from '../../../menu-items';
-import navigationProfesseur from '../../../menu-items -professeurs';
+import navigationProfesseur from '../../../menu-items-professeurs'; // Correct import path
 import navigationEtudiant from '../../../menu-items-etudiant';
 import { BASE_TITLE } from '../../../config/constant';
-import { useAuth } from '../../../contexts/authContext'
+import { useAuth } from '../../../contexts/authContext';
 import { useNavigate } from 'react-router-dom';
 import { useUserData } from '../../../contexts/userDataContext';
-// import axios from 'axios';
 
 const Breadcrumb = () => {
   const location = useLocation();
@@ -18,68 +17,71 @@ const Breadcrumb = () => {
   const [item, setItem] = useState([]);
   const { logout, isLoggedIn } = useAuth();
   const navigate = useNavigate();
-  const {updateUserData} = useUserData();
+  const { updateUserData } = useUserData();
 
   useEffect(() => {
     const fetchUserData = async () => {
-      const token = localStorage.getItem("token");
+      const token = localStorage.getItem('token');
       const authToken = `Bearer ${token}`;
       try {
         if (token) {
           const response = await fetch(`http://localhost:8080/api/v1/auth/userinfo`, {
             headers: {
-              'Authorization': authToken
+              Authorization: authToken
             }
           });
           if (response.ok) {
             const userData = await response.json();
             updateUserData(userData);
-            localStorage.setItem("user", JSON.stringify(userData));
+            localStorage.setItem('user', JSON.stringify(userData));
+
+            let sidebarNavigation = navigationProfesseur; // Default navigation
+
             if (userData.roles.some(role => role.name === 'ROLE_ADMIN')) {
-              sidebar(navigation);
-            } else if (userData.roles.some(role => role.name === 'ROLE_PROFESSOR') && !userData.roles.some(role => role.name === 'ROLE_ADMIN')) {
-              sidebar(navigationProfesseur);
-            } else if (userData.roles.some(role => role.name === 'ROLE_ETUDIANT') && !userData.roles.some(role => role.name === 'ROLE_ADMIN')) {
-              sidebar(navigationEtudiant);
+              sidebarNavigation = navigation;
+            } else if (userData.roles.some(role => role.name === 'ROLE_PROFESSOR')) {
+              sidebarNavigation = navigationProfesseur; // Set professor navigation
+            } else if (userData.roles.some(role => role.name === 'ROLE_ETUDIANT')) {
+              sidebarNavigation = navigationEtudiant;
             }
+
+            sidebar(sidebarNavigation); // Call sidebar with the appropriate navigation
           } else {
-            // Si la réponse n'est pas OK, lancez une erreur
-            throw new Error('Erreur lors de la récupération des données utilisateur');
+            throw new Error('Error retrieving user data');
           }
         }
       } catch (error) {
-        console.error("Erreur lors de la récupération des données utilisateur :", error);
+        console.error('Error retrieving user data:', error);
         logout();
-        navigate("/login");
+        navigate('/login');
       }
     };
     fetchUserData();
-  }, []);
+  }, [updateUserData]); // Include updateUserData as a dependency
 
   if (!isLoggedIn) {
-    navigate("/login")
-  }
-  const sidebar = (navigationbar) => {
-    navigationbar.items.map((item, index) => {
-      if (item.type && item.type === 'group') {
-        getCollapse(item, index);
-      }
-      return false;
-    });
+    navigate('/login');
   }
 
-  const getCollapse = (item, index) => {
+  const sidebar = navigationBar => {
+    navigationBar.items.forEach(item => {
+      if (item.type && item.type === 'group') {
+        getCollapse(item);
+      }
+    });
+  };
+
+  const getCollapse = item => {
     if (item.children) {
-      item.children.filter((collapse) => {
+      item.children.forEach(collapse => {
         if (collapse.type && collapse.type === 'collapse') {
-          getCollapse(collapse, index);
+          getCollapse(collapse);
         } else if (collapse.type && collapse.type === 'item') {
           if (location.pathname === collapse.url) {
             setMain(item);
             setItem(collapse);
           }
         }
-        return false;
       });
     }
   };

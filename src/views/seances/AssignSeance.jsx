@@ -5,42 +5,96 @@ import axios from 'axios'; // Import axios for making HTTP requests
 import Button from '@mui/material/Button';
 
 export default function AssignProfessor() {
-  const { id } = useParams(); // Access the id parameter from the URL
+  const { id } = useParams();
   const navigate = useNavigate();
   const [professors, setProfessors] = useState([]);
+  const [seance, setSeance] = useState([]);
+  const [alias, setAlias] = useState("");
   const [affectedProfessor, setAffectedProfessor] = useState(null);
-
-  const handleUpdate = async () => {
-    try {
-      const token = localStorage.getItem('token');
-
-      const response = await axios.post(`http://localhost:8080/seances/affect/${id}`, affectedProfessor, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          'Content-Type': 'application/json' // Set content type to application/json
-        }
-      });
-
-      // Handle response
-      console.log('Professor assigned successfully:', response.data);
-      navigate(-1);
-
-
-      // Optionally, you can navigate to another page or perform other actions upon successful update
-    } catch (error) {
-      console.error('Error updating element:', error);
-      navigate(-1);
-
-    }
-    
-  };
+  const [showAlias, setShowAlias] = useState(false); // State to control the visibility of the alias input
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         const token = localStorage.getItem('token');
 
-        // Fetch the list of professors
+        // Fetch the seance data
+        const seanceResponse = await axios.get(`http://localhost:8080/seances/${id}`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        setSeance(seanceResponse.data);
+
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      }
+    };
+    fetchData()
+  })
+
+
+  const handleUpdateAlias = async () => {
+    try {
+      const token = localStorage.getItem('token');
+
+      // Extracting IDs from the seance object
+      const seanceToUpdate = {
+        professor: { id: seance.professor.id },
+        salle: seance.salle ? { id: seance.salle.id } : null,
+        element: { id: seance.element.id },
+        type: seance.type,
+        timeTable: { id: seance.timeTable.id },
+        timeSlot: seance.timeSlot ? { id: seance.timeSlot.id } : null,
+        groupe: seance.groupe ? { id: seance.groupe.id } : null,
+        vacataire_alias:alias
+      };
+
+      const response = await axios.put(
+        `http://localhost:8080/seances/${id}`,
+        seanceToUpdate, // Sending only the IDs
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
+        }
+      );
+      console.log('Seance updated successfully:', response.data);
+      console.log(seanceToUpdate);
+    } catch (error) {
+      console.error('Error updating seance:', error);
+    }
+  };
+
+  
+  const handleUpdateProfessor = async () => {
+    try {
+      const token = localStorage.getItem('token');
+
+      const response = await axios.post(`http://localhost:8080/seances/affect/${id}`, affectedProfessor, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+
+      console.log('Professor assigned successfully:', response.data);
+      navigate(-1);
+    } catch (error) {
+      console.error('Error updating element:', error);
+      navigate(-1);
+    }
+  };
+
+  const handleUpdate = () => {
+    handleUpdateAlias()
+    handleUpdateProfessor()
+  }
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const token = localStorage.getItem('token');
+
         const professorsResponse = await axios.get('http://localhost:8080/professors', {
           headers: { Authorization: `Bearer ${token}` }
         });
@@ -67,10 +121,12 @@ export default function AssignProfessor() {
                       <Form.Control
                         as="select"
                         name="professor"
-                        // value={element ? element.professor.id : ''}
                         onChange={(e) => {
                           setAffectedProfessor({ id: e.target.value });
-                          console.log('The sent professor ', affectedProfessor);
+
+                          const selectedProfessor = professors.find((prof) => prof.id == e.target.value);
+                          console.log(selectedProfessor);
+                          setShowAlias(selectedProfessor && selectedProfessor.type === 'Vacataire');
                         }}
                       >
                         <option value="">Sélectionnez un professeur</option>
@@ -80,6 +136,12 @@ export default function AssignProfessor() {
                           </option>
                         ))}
                       </Form.Control>
+                      {showAlias && (
+                        <Form.Group className="mb-3">
+                          <Form.Label>Nom du vacataire</Form.Label>
+                          <Form.Control onChange={(e) => setAlias(e.target.value)} type="text" placeholder="Entrer le nom du vacataire" />
+                        </Form.Group>
+                      )}
                     </Form.Group>
                   </Form>
                 </Col>

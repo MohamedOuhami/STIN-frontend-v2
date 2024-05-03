@@ -76,8 +76,68 @@ const routes = [
       },
       {
         exact: 'true',
+        path: '/prepaStudents/create',
+        element: lazy(() => import('./views/prepaStudents/createPrepaStudent'))
+      },
+      {
+        exact: 'true',
+        path: '/prepaStudents/update/:id',
+        element: lazy(() => import('./views/prepaStudents/updatePrepaStudent'))
+      },
+
+      {
+        exact: 'true',
+        path: '/ingStudents',
+        element: lazy(() => import('./views/ingStudents/ingStudentsList'))
+      },
+      {
+        exact: 'true',
+        path: '/ingStudents/create',
+        element: lazy(() => import('./views/ingStudents/createIngStudent'))
+      },
+      {
+        exact: 'true',
+        path: '/ingStudents/update/:id',
+        element: lazy(() => import('./views/ingStudents/updateIngStudent'))
+      },
+
+      
+      {
+        exact: 'true',
+        path: '/professors',
+        element: lazy(() => import('./views/professors/ProfessorList'))
+      },
+      {
+        exact: 'true',
+        path: '/professors/create',
+        element: lazy(() => import('./views/professors/createProfessor'))
+      },
+      {
+        exact: 'true',
+        path: '/professors/update/:id',
+        element: lazy(() => import('./views/professors/updateProfessor'))
+      },
+      {
+        exact: 'true',
+        path: '/professors/addWants/:id',
+        element: lazy(() => import('./views/professors/AddWants'))
+      },
+      {
+        exact: 'true',
         path: '/salles',
         element: lazy(() => import('./views/salles/sallesList'))
+      },
+
+      {
+        exact: 'true',
+        path: '/salles/create',
+        element: lazy(() => import('./views/salles/createSalle'))
+      },
+
+      {
+        exact: 'true',
+        path: '/salles/update/:id',
+        element: lazy(() => import('./views/salles/updateSalle'))
       },
 
       {
@@ -88,13 +148,31 @@ const routes = [
 
       {
         exact: 'true',
+        path: '/modules/create',
+        element: lazy(() => import('./views/modules/createModule'))
+      },
+
+      {
+        exact: 'true',
+        path: '/modules/update/:id',
+        element: lazy(() => import('./views/modules/updateModule'))
+      },
+
+      {
+        exact: 'true',
         path: '/elements',
         element: lazy(() => import('./views/elements/ElementsList'))
       },
 
       {
         exact: 'true',
-        path: '/seances',
+        path: '/elements/create',
+        element: lazy(() => import('./views/elements/createElement'))
+      },
+
+      {
+        exact: 'true',
+        path: '/seances/:id',
         element: lazy(() => import('./views/seances/SeancesList'))
       },
       {
@@ -105,13 +183,23 @@ const routes = [
       {
         exact: 'true',
         path: '/seances/edit/:id',
-        element: lazy(() => import('./views/seances/EditSeance2'))
+        element: lazy(() => import('./views/seances/EditSeance'))
+      },
+      {
+        exact: 'true',
+        path: '/seances/create/:timeTableIndex/:sectionId/:cellIndex',
+        element: lazy(() => import('./views/seances/CreateSeance'))
       },
 
       {
         exact: 'true',
         path: '/emplois/:fil',
         element: lazy(() => import('./views/emplois/EmploisList'))
+      },
+      {
+        exact: 'true',
+        path: '/emplois/timetable/:id/:sectionId',
+        element: lazy(() => import('./views/emplois/EmploisShowTimetable'))
       },
       {
         exact: 'true',

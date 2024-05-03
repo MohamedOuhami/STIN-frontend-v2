@@ -5,14 +5,12 @@ import { DataGrid } from '@mui/x-data-grid';
 import Button from '@mui/material/Button';
 import { useNavigate } from 'react-router-dom';
 
-const PrepaStudentsList = () => {
-  const [students, setStudents] = useState([]);
+const ProfessorList = () => {
+  const [professors, setProfessors] = useState([]);
 
   const navigate = useNavigate();
 
   const columns = [
-    { field: 'cin', headerName: 'CIN', width: 130 },
-    { field: 'cne', headerName: 'CNE', width: 130 },
     { field: 'firstName', headerName: 'Prénom', width: 130 },
     { field: 'lastName', headerName: 'Nom', width: 130 },
     { field: 'email', headerName: 'Email', width: 130 },
@@ -20,13 +18,16 @@ const PrepaStudentsList = () => {
     {
       headerName: 'Actions',
       field: 'actions',
-      width: 250,
+      width: 500,
       renderCell: (params) => (
         <Col>
           <Button variant="contained" color="primary" onClick={() => handleUpdateStudent(params.row.id)}>
             Modifier
           </Button>
-          <Button sx={{mx:1}} variant="contained" color="warning" onClick={() => handleDeleteStudent(params.row.id)}>
+          <Button sx={{ ml: 1 }} variant="contained" color="info" onClick={() => handleAddWants(params.row.id)}>
+            Ajouter voeux
+          </Button>
+          <Button sx={{ mx: 1 }} variant="contained" color="warning" onClick={() => handleDeleteStudent(params.row.id)}>
             Supprimer
           </Button>
         </Col>
@@ -35,20 +36,24 @@ const PrepaStudentsList = () => {
   ];
 
   const handleNewStudent = () => {
-    navigate('/prepaStudents/create');
+    navigate('/professors/create');
+  };
+
+  const handleAddWants = (id) => {
+    navigate('/professors/addWants/' + id);
   };
 
   const handleUpdateStudent = (id) => {
-    navigate('/prepaStudents/update/' + id);
+    navigate('/professors/update/' + id);
   };
 
   const handleDeleteStudent = async (id) => {
     try {
       const token = localStorage.getItem('token');
-      const response = await axios.delete('http://localhost:8080/prepaStudents/'+id, {
+      const response = await axios.delete('http://localhost:8080/professors/' + id, {
         headers: { Authorization: `Bearer ${token}` }
       });
-      fetchData()
+      fetchData();
       console.log(response.data);
     } catch (error) {
       console.error('Error fetching Prepas:', error);
@@ -59,10 +64,11 @@ const PrepaStudentsList = () => {
     const fetchData = async () => {
       try {
         const token = localStorage.getItem('token');
-        const response = await axios.get('http://localhost:8080/prepaStudents', {
+        const response = await axios.get('http://localhost:8080/professors', {
           headers: { Authorization: `Bearer ${token}` }
         });
-        setStudents(response.data); // Update state with fetched data
+        setProfessors(response.data); // Update state with fetched data
+        console.log(response.data);
       } catch (error) {
         console.error('Error fetching Prepas:', error);
       }
@@ -79,11 +85,11 @@ const PrepaStudentsList = () => {
               <Card.Title as="h5">Liste des étudiants du classe préparatoire</Card.Title>
             </Card.Header>
             <Card.Body>
-              <Button sx={{mb:3}} onClick={() => handleNewStudent()} variant="contained">
-                Créer un nouvel étudiant
+              <Button sx={{ mb: 3 }} onClick={() => handleNewStudent()} variant="contained">
+                Créer un nouveau professeur
               </Button>
               <DataGrid
-                rows={students}
+                rows={professors}
                 columns={columns}
                 initialState={{
                   pagination: {
@@ -100,4 +106,4 @@ const PrepaStudentsList = () => {
   );
 };
 
-export default PrepaStudentsList;
+export default ProfessorList;

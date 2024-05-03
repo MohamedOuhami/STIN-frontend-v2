@@ -5,7 +5,7 @@ import { DataGrid } from '@mui/x-data-grid';
 import Button from '@mui/material/Button';
 import { useNavigate } from 'react-router-dom';
 
-const PrepaStudentsList = () => {
+const IngStudentsList = () => {
   const [students, setStudents] = useState([]);
 
   const navigate = useNavigate();
@@ -35,23 +35,23 @@ const PrepaStudentsList = () => {
   ];
 
   const handleNewStudent = () => {
-    navigate('/prepaStudents/create');
+    navigate('/ingStudents/create');
   };
 
   const handleUpdateStudent = (id) => {
-    navigate('/prepaStudents/update/' + id);
+    navigate('/ingStudents/update/' + id);
   };
 
   const handleDeleteStudent = async (id) => {
     try {
       const token = localStorage.getItem('token');
-      const response = await axios.delete('http://localhost:8080/prepaStudents/'+id, {
+      const response = await axios.delete('http://localhost:8080/ingStudents/admin/delete/'+id, {
         headers: { Authorization: `Bearer ${token}` }
       });
       fetchData()
       console.log(response.data);
     } catch (error) {
-      console.error('Error fetching Prepas:', error);
+      console.error('Error fetching Ings:', error);
     }
   };
 
@@ -59,12 +59,12 @@ const PrepaStudentsList = () => {
     const fetchData = async () => {
       try {
         const token = localStorage.getItem('token');
-        const response = await axios.get('http://localhost:8080/prepaStudents', {
+        const response = await axios.get('http://localhost:8080/ingStudents/admin/all', {
           headers: { Authorization: `Bearer ${token}` }
         });
         setStudents(response.data); // Update state with fetched data
       } catch (error) {
-        console.error('Error fetching Prepas:', error);
+        console.error('Error fetching Ings:', error);
       }
     };
     fetchData();
@@ -76,7 +76,7 @@ const PrepaStudentsList = () => {
         <Col>
           <Card>
             <Card.Header>
-              <Card.Title as="h5">Liste des étudiants du classe préparatoire</Card.Title>
+              <Card.Title as="h5">Liste des étudiants du cycle Ingenieur</Card.Title>
             </Card.Header>
             <Card.Body>
               <Button sx={{mb:3}} onClick={() => handleNewStudent()} variant="contained">
@@ -100,4 +100,4 @@ const PrepaStudentsList = () => {
   );
 };
 
-export default PrepaStudentsList;
+export default IngStudentsList;

@@ -43,9 +43,14 @@ const NavBar = () => {
         </Link>
         <Link to="#" className="b-brand">
           <div className="b-bg">
-            <i className="feather icon-trending-up" />
+            <img
+              src={require('/home/v01d/Documents/ENSAJ/PFA/STIN-frontend-v2/src/assets/images/image.png')}
+              alt="Trending up icon"
+              className="img-fluid"
+              style={{ maxWidth: '50px' }}
+            />
           </div>
-          <span className="b-title">Datta Able</span>
+          <span className="b-title">STIN Manager</span>
         </Link>
         <Link to="#" className={moreClass.join(' ')} onClick={() => setMoreToggle(!moreToggle)}>
           <i className="feather icon-more-vertical" />

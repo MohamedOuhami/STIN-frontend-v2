@@ -8,11 +8,15 @@ import Button from '@mui/material/Button';
 const ElementList = () => {
   const [elements, SetElements] = useState([]);
 
-  const navigate = useNavigate()
+  const navigate = useNavigate();
+
+  const handleNewElement = () => {
+    navigate('/elements/create');
+  };
 
   const handleUpdate = (id) => {
-    navigate("/elements/edit/"+id);
-  }
+    navigate('/elements/edit/' + id);
+  };
 
   const columns = [
     { field: 'name', headerName: 'Nom', width: 300 },
@@ -21,13 +25,13 @@ const ElementList = () => {
       field: 'Professeur',
       headerName: 'Professeur',
       width: 300,
-      renderCell: (params) => params.row.professor ? params.row.professor.firstName + ' ' + params.row.professor.lastName : ""
+      renderCell: (params) => (params.row.professor ? params.row.professor.firstName + ' ' + params.row.professor.lastName : '')
     },
     {
       field: 'Module',
       headerName: 'Module',
       width: 300,
-      renderCell: (params) => params.row.module ? params.row.module.name : ""
+      renderCell: (params) => (params.row.module ? params.row.module.name : '')
     },
     { field: 'nbr_seances_per_week_Cours', headerName: 'Nombre de séances de Cours par semaine', width: 300 },
     { field: 'nbr_seances_per_week_TD', headerName: 'Nombre de séances de TD par semaine', width: 300 },
@@ -38,7 +42,9 @@ const ElementList = () => {
       headerName: 'Update', // Button column header
       width: 150,
       renderCell: (params) => (
-        <Button onClick={() => handleUpdate(params.row.id)} variant='contained' color='primary'>Modifier</Button> // Button element with onClick handler
+        <Button onClick={() => handleUpdate(params.row.id)} variant="contained" color="primary">
+          Modifier
+        </Button> // Button element with onClick handler
       )
     }
   ];
@@ -68,6 +74,9 @@ const ElementList = () => {
               <Card.Title as="h5">Liste des elements</Card.Title>
             </Card.Header>
             <Card.Body>
+              <Button sx={{ mb: 3 }} onClick={() => handleNewElement()} variant="contained">
+                Créer un nouvel element
+              </Button>
               <DataGrid
                 rows={elements}
                 columns={columns}
